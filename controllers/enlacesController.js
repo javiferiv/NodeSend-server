@@ -12,9 +12,6 @@ exports.nuevoEnlace = async (req, res, next) => {
     }
 
     //Crear un objeto de Enlace
-
-    console.log(req.body)
-
     const { nombreOriginal, nombre } = req.body;
     const enlace = new Enlaces();
     enlace.url = shortid.generate();
@@ -51,6 +48,18 @@ exports.nuevoEnlace = async (req, res, next) => {
    
 }
 
+//Obtiene un listado de todos los enlaces
+
+exports.todosEnlaces = async (req, res) => {
+    try {
+        const enlaces = await Enlaces.find({}).select('url -_id');
+        res.json({enlaces});
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
 //Obtener el enlace
 exports.obtenerEnlace = async (req, res, next) => {
 
@@ -64,22 +73,6 @@ exports.obtenerEnlace = async (req, res, next) => {
 
     //Si el enlace existe
     res.json({ archivo: enlace.nombre })
-    
-    //Si las descargas son iguales a 1 - Borrar entrada y borrar archivo
-    const { descargas, nombre } = enlace;
 
-    if (descargas === 1) {
-        //Eliminar el archivo
-        req.archivo = nombre;
-
-        //Eliminar la entrada de la BBDD
-        await Enlaces.findOneAndRemove(req.params.url);
-        next();
-    }
-    else {
-        //Si las descargas son mayores a 1 - Restar una descarga
-        enlace.descargas--;
-        await enlace.save();
-    }
-
+    next();
 }

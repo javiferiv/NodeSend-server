@@ -1,4 +1,5 @@
 const { CustomValidation } = require('express-validator/src/context-items');
+const Enlaces = require('./../models/Enlace');
 const multer = require('multer');
 const shortid = require('shortid');
 const fs = require('fs');
@@ -33,9 +34,37 @@ exports.subirArchivos = async (req, res, next) => {
   
 };
 
-exports.eliminarArchivos = async (req, res) => {
+//Descarga un archivo
+exports.descargar = async (req, res, next) => {
 
-    console.log(req.archivo)
+    //Obtiene el enlace
+    const enlace = await Enlaces.findOne({nombre : req.params.archivo})
+
+    const archivoDescarga = __dirname + '/../uploads/' + req.params.archivo;
+    res.download(archivoDescarga);
+
+    //Eliminar el archivo
+    //Si las descargas son iguales a 1 - Borrar entrada y borrar archivo
+    const { descargas, nombre } = enlace;
+
+    if (descargas === 1) {
+        //Eliminar el archivo
+        req.archivo = nombre;
+
+        //Eliminar la entrada de la BBDD
+        await Enlaces.findOneAndRemove(enlace.id);
+        next();
+    }
+    else {
+        //Si las descargas son mayores a 1 - Restar una descarga
+        enlace.descargas--;
+        await enlace.save();
+    }
+
+};
+
+//Eliminar un archivo
+exports.eliminarArchivos = async (req, res) => {
 
     try {
         fs.unlinkSync(__dirname + `/../uploads/${req.archivo}`)
