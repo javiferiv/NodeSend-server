@@ -12,10 +12,13 @@ exports.nuevoEnlace = async (req, res, next) => {
     }
 
     //Crear un objeto de Enlace
-    const { nombreOriginal } = req.body;
+
+    console.log(req.body)
+
+    const { nombreOriginal, nombre } = req.body;
     const enlace = new Enlaces();
     enlace.url = shortid.generate();
-    enlace.nombre = shortid.generate();
+    enlace.nombre = nombre;
     enlace.nombreOriginal = nombreOriginal;
 
     //Si el usuario está autenticado
