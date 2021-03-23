@@ -19,7 +19,8 @@ router.get('/',
 );
 
 router.get('/:url',
-    enlacesController.obtenerEnlace,
+    enlacesController.tienePassword,
+    enlacesController.obtenerEnlace
 );
 
 module.exports = router;
